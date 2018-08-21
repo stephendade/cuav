@@ -145,7 +145,7 @@ def process(args):
       MPSetting('target_radius', float, float(target[2]), 'target radius', increment=1),
       MPSetting('quality', int, 75, 'Compression Quality', range=(1,100), increment=1),
       MPSetting('thumbsize', int, args.thumbsize, 'Thumbnail Size', range=(10, 200), increment=1),
-      MPSetting('RegionHue', int, ags.targethue, 'Target Hue (0 to disable)', range=(0,180), increment=1, tab='Imaging'),
+      MPSetting('RegionHue', str, "", 'Target Hues in csv format (ie "110, 230")', tab='Imaging'),
       MPSetting('map_thumbsize', int, args.map_thumbsize, 'Map Thumbnail Size', range=(10, 200), increment=1),
       MPSetting('minscore', int, args.minscore, 'Min Score', range=(0,1000), increment=1, tab='Scoring'),
       MPSetting('brightness', float, 1.0, 'Display Brightness', range=(0.1, 10), increment=0.1,
@@ -272,7 +272,7 @@ def process(args):
 
       regions = cuav_region.filter_regions(im_full, regions, min_score=camera_settings.minscore,
                                            filter_type=camera_settings.filter_type,
-                                           target_hue=camera_settings.RegionHue)
+                                           target_hue=camera_settings.RegionHue.split(','))
 
       if pos:
         for r in regions:
@@ -350,7 +350,7 @@ def parse_args():
     parser.add_argument("--map-thumbsize", default=60, type=int, help="map thumbnail size")
     parser.add_argument("--mosaic-thumbsize", default=35, type=int, help="mosaic thumbnail size")
     parser.add_argument("--minscore", default=100, type=int, help="minimum score")
-    parser.add_argument("--targethue", default=0, type=int, help="Target hue (0-180) of object")
+    parser.add_argument("--targethue", default="", type=str, help="Target Hues in csv format (ie '110, 230')")
     parser.add_argument("--gammalog", default=None, type=str, help="gamma.log from flight")
     parser.add_argument("--target", default=None, type=str, help="lat,lon,radius target")
     parser.add_argument("--categories", default=None, type=str, help="xml file containing categories for classification")

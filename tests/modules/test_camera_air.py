@@ -142,7 +142,7 @@ def test_camera_command(mpstate, image_file):
     loadedModule.unload()
 
     assert loadedModule.camera_settings.minscore == 50
-
+    
 def test_camera_image_request(mpstate, image_file):
     '''image request via the block_xmit'''
     loadedModule = camera_air.init(mpstate)
@@ -150,6 +150,7 @@ def test_camera_image_request(mpstate, image_file):
     loadedModule.cmd_camera(["set", "camparms", parms])
     loadedModule.cmd_camera(["set", "imagefile", image_file])
     loadedModule.cmd_camera(["set", "minscore", "0"])
+    loadedModule.cmd_camera(["set", "RegionHue", "110, 220"])
     loadedModule.cmd_camera(["set", "gcs_address", "127.0.0.1:14550:14560:2000000"])
 
     filename = os.path.join(os.getcwd(), 'tests', 'testdata', 'raw2016111223465160Z.png')

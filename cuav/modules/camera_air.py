@@ -69,7 +69,7 @@ class CameraAirModule(mp_module.MPModule):
               MPSetting('thumbsize', int, 60, 'Thumbnail Size', range=(10, 200), increment=1),
               MPSetting('minscore', int, 400, 'Min Score to pass detection', range=(0,5000), increment=1, tab='Imaging'),
               MPSetting('clock_sync', bool, False, 'GPS Clock Sync'),
-              MPSetting('RegionHue', int, 110, 'Target Hue (0 to disable)', range=(0,180), increment=1, digits=1, tab='Imaging'),
+              MPSetting('RegionHue', str, "", 'Target Hues in csv format (ie "110, 230")', tab='Imaging'),
               ],
             title='Camera Settings'
             )
@@ -270,7 +270,7 @@ class CameraAirModule(mp_module.MPModule):
             regions = cuav_region.filter_regions(img_scan, regions,
                                                  min_score=self.camera_settings.minscore,
                                                  filter_type=self.camera_settings.filter_type,
-                                                 target_hue=self.camera_settings.RegionHue)
+                                                 target_hue=self.camera_settings.RegionHue.split(','))
             self.region_count += len(regions)
             
             if self.camera_settings.roll_stabilised:

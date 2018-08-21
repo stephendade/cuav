@@ -176,7 +176,7 @@ def hsv_score(r, hsv, use_whiteness=False):
     r.score = r.scan_score*(s_range/128.0)*log_scaling(col_score,0.3)
     #print(r.score, red_count, blue_count, num_pixels)
 
-def score_region(img, r, filter_type='simple', target_hue=0):
+def score_region(img, r, filter_type='simple', target_hue=[]):
     '''filter a list of regions using HSV values'''
     (x1, y1, x2, y2) = r.tuple()
     (w,h) = cuav_util.image_shape(img)
@@ -189,19 +189,26 @@ def score_region(img, r, filter_type='simple', target_hue=0):
     hsv = cv2.cvtColor(img[y1:y2, x1:x2], cv2.COLOR_BGR2HSV)
     hsv_score(r, hsv)
     
-    #set score to 0 if outside hue range
-    if target_hue != 0:
+    #set score to 30% or original value if outside hue range(s)
+    if target_hue != []:
         hue, saturation, lightness = cv2.split(hsv)
         (height,width,d) = shape(hsv)
-        retb, dest = cv2.threshold(hue, max(target_hue-3, 0), 255, cv2.THRESH_TOZERO)
-        retb, dest = cv2.threshold(dest, min(target_hue+3, 180), 255, cv2.THRESH_TOZERO_INV)
-        ret, dest = cv2.threshold(dest, 0, 255, cv2.THRESH_BINARY)
-        #if less than 5% of the pixels are in hue range, then reject
-        if (cv2.countNonZero(dest)*100/(width*height)) < 5:
-            r.score = 0
-        
+        dest_combined = None
+        for thue in target_hue:
+            thue = thue.strip()
+            if thue != "":
+                retb, dest = cv2.threshold(hue, max(int(thue)-3, 0), 255, cv2.THRESH_TOZERO)
+                retb, dest = cv2.threshold(dest, min(int(thue)+3, 180), 255, cv2.THRESH_TOZERO_INV)
+                ret, dest = cv2.threshold(dest, 0, 255, cv2.THRESH_BINARY)
+                if dest_combined is None:
+                    dest_combined = dest
+                else:
+                    cv2.bitwise_or(dest_combined, dest)
+        #if less than 5% of the pixels are in hue range, then lower the score
+        if dest_combined is not None and (cv2.countNonZero(dest_combined)*100/(width*height)) < 5:
+            r.score = 0.3*r.score
 
-def filter_regions(img, regions, min_score=4, filter_type='simple', target_hue=0):
+def filter_regions(img, regions, min_score=4, filter_type='simple', target_hue=[]):
     '''filter a list of regions using HSV values'''
     ret = []
     for r in regions:

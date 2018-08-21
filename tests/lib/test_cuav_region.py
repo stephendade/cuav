@@ -77,6 +77,14 @@ def test_score_region():
     assert newregion.whiteness == None
     assert newregion.score > 0
 
+def test_score_region_hue():
+    im_orig = cv2.imread(os.path.join(os.getcwd(), 'tests', 'testdata', 'test-8bit.png'))
+    newregion = cuav_region.Region(1020, 658, 1050, 678, (30, 30), scan_score=20)
+    cuav_region.score_region(im_orig, newregion, filter_type='simple', target_hue=["110", "220"])
+    assert newregion.hsv_score > 0
+    assert newregion.whiteness == None
+    assert newregion.score > 0
+    
 def test_filter_regions():
     im_orig = cv2.imread(os.path.join(os.getcwd(), 'tests', 'testdata', 'test-8bit.png'))
     regions = []
