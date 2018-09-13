@@ -30,4 +30,5 @@ module load map
 map3 follow 0
 map3 zoom 50
 
-
+#output to big screen
+output add udp:127.0.0.1:16000
